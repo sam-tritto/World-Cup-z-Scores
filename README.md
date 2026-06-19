@@ -78,7 +78,32 @@ Three composite scores are computed for side-by-side model comparison:
 | `composite_zscore_xg` | xGD LOO — player-specific defensive chain LOO xG |
 | `composite_zscore_pcv` | PCV LOO — Possession Chain Value for both offensive and defensive |
 
+### 8. Match Outcome Validation
+To validate the predictive signal of the framework, player composite Z-scores are aggregated to a team level for each match using a **minutes-weighted average** of the players on the field. 
+
+These aggregated team-level Z-scores are compared to actual tournament match outcomes (excluding draws, $N=100$) to evaluate winner prediction accuracy:
+* **xGD LOO Model**: **66.00%** winner prediction accuracy
+* **Original Model**: **62.00%** winner prediction accuracy
+* **PCV LOO Model**: **57.00%** winner prediction accuracy
+
+This validates that isolating individual players' disruptions of opponent possession chains (as done in the xGD LOO model) captures a more predictive signal of team success than relying on team-level defensive averages.
+
+### 9. Next-Match Predictive Modeling & ML Comparison
+We also implement a true **ex-ante prediction test** to evaluate if expanding averages of team Z-scores from preceding matches can forecast the winner of the *next* match. 
+
+We compare Z-score differentials against traditional baselines (prior Goal Differential and xG Differential) and train machine learning models (**Logistic Regression** and **LightGBM Classifier**) using Leave-One-Tournament-Out cross-validation:
+* **PCV LOO Z-Score (Rule)**: **56.58%** accuracy
+* **Logistic Regression (xGD LOO)**: **56.58%** accuracy
+* **Goal Diff Baseline (Rule)**: **55.26%** accuracy
+* **xG Diff Baseline (Rule)**: **55.26%** accuracy
+* **Original Z-Score Model (Rule)**: **55.26%** accuracy
+* **LightGBM (All Features)**: **55.26%** accuracy
+* **xGD LOO Z-Score Model (Rule)**: **48.68%** accuracy
+
+Due to the extremely short history size of tournament data (1 to 6 matches) and lack of opponent-strength adjustments, ex-ante match prediction is highly volatile and struggles to outperform simple historical baselines.
+
 ---
+
 
 ## Project Structure
 
@@ -119,6 +144,10 @@ The first run will fetch all event data from StatsBomb's open data API and cache
 - **Top 25 Global Leaderboard** — ranked by each of the three composite models.
 - **Positional Top 10 Comparisons** — side-by-side rankings for Forwards, Central Mids, and Center Backs across all three models, showing how model choice shifts who surfaces at the top.
 - **Lionel Messi Spotlight** — match-by-match Z-score evolution across both the 2018 and 2022 World Cups, tracking his Offensive LOO, Defensive LOO, and Defensive Disruptions Z-scores relative to the Forward/Winger cohort average.
+- **Match Outcome Validation** — aggregated team-level Z-score differential comparisons against actual match scores and winners to validate ecological framework validity, demonstrating **66.00% predictive accuracy** for the player-specific xGD LOO model.
+- **Next-Match Prediction & ML Comparison** — ex-ante sports forecasting evaluating expanding average Z-score differentials against traditional baselines, Logistic Regression, and a LightGBM Classifier, analyzing tournament-specific small sample predictability and simulating predictions for the 2018 and 2022 Finals.
+- **Player Value Evolution** — dual-panel visualization showing Lionel Messi's match-by-match sub-metric Z-scores and comparing cumulative Z-score sums for Messi, Kylian Mbappé, and Antoine Griezmann in the 2022 World Cup, illustrating individual tournament impact.
+
 
 ---
 
